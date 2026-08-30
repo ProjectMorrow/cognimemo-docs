@@ -1,59 +1,56 @@
 # MCP Server
 
-Cognimemo provides an MCP (Model Context Protocol) server that allows AI agents to store and retrieve memories.
+Cognimemo speaks the **Model Context Protocol**, so agents like Claude, Cursor, and Windsurf can retain and recall memories with no SDK.
 
-## Connecting
+## Endpoints
 
-Add Cognimemo to your MCP client configuration:
+| Mode | URL | Auth |
+|------|-----|------|
+| **Key auth** | `https://api.cognimemo.com/mcp` | `Authorization: Bearer cmk_live_…` (key needs the `mcp` scope) |
+| **Session** | `https://app.cognimemo.com/api/mcp` | Browser session cookie (from the console) |
+| **Self-hosted** | `http://localhost:8787/mcp` | Local gateway |
 
-### Claude Desktop
-
-Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "cognimemo": {
-      "url": "https://dev-api.cognimemo.com/mcp",
-      "headers": {
-        "Authorization": "Bearer cmk_live_..."
-      }
-    }
-  }
-}
-```
-
-### Cursor
-
-Add to your Cursor MCP settings:
+## Connect Claude / Cursor
 
 ```json
 {
   "mcpServers": {
     "cognimemo": {
-      "url": "https://dev-api.cognimemo.com/mcp",
-      "headers": {
-        "Authorization": "Bearer cmk_live_..."
-      }
+      "url": "https://api.cognimemo.com/mcp",
+      "headers": { "Authorization": "Bearer cmk_live_…" }
     }
   }
 }
 ```
 
-## Available Tools
+Create the key in [app.cognimemo.com](https://app.cognimemo.com) → Connect → API Keys, with the `mcp` scope enabled.
 
-The MCP server exposes these tools:
+## Key tools
 
-| Tool | Scope Required | Description |
-|------|---------------|-------------|
-| `retain` | `retain` | Store a memory |
-| `recall` | `recall` | Retrieve memories by query |
-| `reflect` | `reflect` | Generate insights from memories |
-| `list_banks` | `recall` | List memory banks |
-| `list_entities` | `graph:read` | List extracted entities |
+| Tool | Purpose |
+|------|---------|
+| `retain` | Store a memory (`content`, `context`, `tags`, `metadata`, `timestamp`, `document_id`). |
+| `sync_retain` | Retain and wait, for read-after-write. |
+| `recall` | Search memories. Supports **`types`** to filter by fact type (see below). |
+| `reflect` | Generate a synthesized answer from memories + observations. |
+| `list_memories` / `get_memory` | Browse and fetch memories. |
+| `list_directives` / `create_directive` | Hard rules for reflect. |
+| Mental-model tools | Create / refresh / read consolidated standing answers. |
 
-## API Key Requirements
+Read-only tools (`recall`, `reflect`, `list_*`, `get_*`) are marked `readOnlyHint`; deletes are marked `destructiveHint`.
 
-Your API key must have the `mcp` scope (or individual operation scopes like `retain`, `recall`, `reflect`).
+## Type-filtered recall
 
-Create a key in **Settings → API Keys** with the `mcp` scope.
+The `recall` tool's `types` accepts any of the eight fact types:
+
+`world` · `experience` · `observation` · `procedure` · `reasoning` · `preference` · `correction` · `profile`
+
+Omit it to search all types. See [Typed memory blocks](/concepts/typed-blocks).
+
+## Encryption
+
+Banks with [managed encryption](/concepts/encryption) work over MCP with **no client changes** — memories written via `retain` are stored encrypted, and `recall` / `reflect` decrypt transparently. Enable it per bank via the SDK or console, not an MCP tool.
+
+## Deployment guidance
+
+Set `COGNIMEMO_API_MCP_INSTRUCTIONS` on the server to append local rules to the `retain`/`recall` tool descriptions (e.g. which tags to use).

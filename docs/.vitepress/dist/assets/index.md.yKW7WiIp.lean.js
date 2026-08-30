@@ -1,1 +1,0 @@
-import{_ as i,o as a,c as s,a0 as t}from"./chunks/framework.CShDTZbC.js";const g=JSON.parse('{"title":"Cognimemo","description":"","frontmatter":{},"headers":[],"relativePath":"index.md","filePath":"index.md"}'),n={name:"index.md"};function l(r,e,o,h,p,d){return a(),s("div",null,[...e[0]||(e[0]=[t("",9)])])}const k=i(n,[["render",l]]);export{g as __pageData,k as default};
