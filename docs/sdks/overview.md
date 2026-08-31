@@ -1,6 +1,6 @@
 # SDKs
 
-Official clients for Cognimemo. Both talk to the [Gateway](/cloud/gateway) with a per-project API key and expose the same surface: retain / recall / reflect, typed blocks, spaces, layered recall, entities, and encryption.
+Official clients for Cognimemo. Both talk to the [Gateway](/cloud/gateway) with a per-project API key and expose the same surface: retain / recall / reflect, typed blocks, spaces, layered recall, and entities. Encryption at rest is a [project-level console policy](/concepts/encryption), not an SDK call — recall keeps returning plaintext whether it's on or off.
 
 | SDK | Package | Guide |
 |-----|---------|-------|

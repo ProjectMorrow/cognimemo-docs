@@ -4,6 +4,12 @@ export default defineConfig({
   title: "Cognimemo",
   description: "Persistent, queryable memory for AI agents — retain, recall, reflect.",
   cleanUrls: true,
+  head: [
+    ["link", { rel: "icon", href: "/favicon.png" }],
+    ["link", { rel: "preconnect", href: "https://fonts.googleapis.com" }],
+    ["link", { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" }],
+    ["link", { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" }],
+  ],
   themeConfig: {
     logo: "/brand/cognimemo-icon.png",
     nav: [
@@ -11,6 +17,7 @@ export default defineConfig({
       { text: "SDKs", link: "/sdks/overview" },
       { text: "API Reference", link: "/api-reference/overview" },
       { text: "MCP", link: "/mcp/overview" },
+      { text: "Playground", link: "/playground" },
     ],
     search: { provider: "local" },
     sidebar: [
@@ -60,6 +67,13 @@ export default defineConfig({
         text: "Cloud",
         items: [
           { text: "Gateway API", link: "/cloud/gateway" },
+        ],
+      },
+      {
+        text: "Try it",
+        items: [
+          { text: "Playground", link: "/playground" },
+          { text: "Performance & accuracy", link: "/benchmarks/performance" },
         ],
       },
       {
