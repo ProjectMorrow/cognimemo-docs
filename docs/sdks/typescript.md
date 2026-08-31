@@ -32,6 +32,12 @@ await cm.listSpaceBanks("acme");
 
 ## Typed memory blocks
 
+Each helper stores a distinct **memory type** that's processed and recalled differently
+— `procedure` (how a task is done), `reasoning` (why a decision was made), `preference`
+(how the user wants things), `correction` (a "no, do it this way" signal), `profile`
+(the user's tools/access). See [Memory types & typed blocks](/concepts/typed-blocks)
+for what each means and when to use it.
+
 ```typescript
 await cm.retainPreference("jane@acme.com", "For day-planning, use personal Gmail, never work mail.");
 await cm.retainProcedure("jane@acme.com", ["make build", "kubectl apply -f prod.yaml"], { rationale: "prod deploy" });

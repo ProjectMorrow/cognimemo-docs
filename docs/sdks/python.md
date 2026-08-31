@@ -41,6 +41,12 @@ cm.remove_bank_from_space("acme", "raj@acme.com")   # person + memories kept
 
 ## Typed memory blocks
 
+Each helper stores a distinct **memory type** that's processed and recalled differently
+— `procedure` (how a task is done), `reasoning` (why a decision was made), `preference`
+(how the user wants things), `correction` (a "no, do it this way" signal), `profile`
+(the user's tools/access). See [Memory types & typed blocks](/concepts/typed-blocks)
+for what each means and when to use it.
+
 ```python
 cm.retain_preference("jane@acme.com", "For day-planning, use personal Gmail, never work mail.")
 cm.retain_procedure("jane@acme.com", ["make build", "kubectl apply -f prod.yaml"], rationale="prod deploy")

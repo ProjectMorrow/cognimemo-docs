@@ -185,7 +185,21 @@ components:
         timestamp: { type: string, format: date-time, description: Event time (ISO 8601); defaults to now. }
         fact_type:
           type: string
-          description: Store as a typed block instead of an auto-extracted fact.
+          description: |
+            Store this content as a specific memory type instead of letting the engine
+            auto-classify it. Typed blocks (procedure/reasoning/preference/correction/profile)
+            are stored **verbatim** — no LLM rewrite.
+
+            - `world` — objective facts about the user/world (default extraction).
+            - `experience` — the agent's own first-person episodes ("I deployed X").
+            - `observation` — engine-generated rollups (normally written by consolidation, not you).
+            - `procedure` — how a task is done: distilled steps + rationale, for replay.
+            - `reasoning` — why a decision was made, so it isn't re-derived next time.
+            - `preference` — a conditional rule for how the user wants things done.
+            - `correction` — a raw "no, do it this way" signal; distilled into preferences.
+            - `profile` — the user's tools/apps/access, so procedures can be matched safely.
+
+            See [Memory types & typed blocks](https://docs.cognimemo.com/concepts/typed-blocks).
           enum: [world, experience, observation, procedure, reasoning, preference, correction, profile]
         tags: { type: array, items: { type: string } }
     RetainResponse:
@@ -206,8 +220,14 @@ components:
         include_org: { type: boolean, default: false, description: Blend the space's org memory (person wins). }
         types:
           type: array
-          description: Restrict to specific fact-types.
-          items: { type: string }
+          description: |
+            Restrict recall to specific memory types (default: all). e.g.
+            `["procedure"]` before acting, `["preference","correction"]` for how-to-behave
+            rules. Values: world, experience, observation, procedure, reasoning, preference,
+            correction, profile — see [Memory types](https://docs.cognimemo.com/concepts/typed-blocks).
+          items:
+            type: string
+            enum: [world, experience, observation, procedure, reasoning, preference, correction, profile]
     RecallResponse:
       type: object
       properties:

@@ -34,7 +34,7 @@ export default defineConfig({
         text: "Concepts",
         items: [
           { text: "Memory model", link: "/concepts/memory-model" },
-          { text: "Typed memory blocks", link: "/concepts/typed-blocks" },
+          { text: "Memory types & blocks", link: "/concepts/typed-blocks" },
           { text: "Org & layered memory", link: "/concepts/org-memory" },
           { text: "Entities & graph", link: "/concepts/entities" },
           { text: "Encryption at rest", link: "/concepts/encryption" },
