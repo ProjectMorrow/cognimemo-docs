@@ -68,10 +68,7 @@ await cm.updateBankConfig("jane@acme.com", { retainAutoEntities: true });
 
 ## Encryption at rest
 
-```typescript
-await cm.enableEncryption("jane@acme.com");   // encryption: "managed"; recall stays transparent
-await cm.disableEncryption("jane@acme.com");
-```
+Encryption is a **project-level policy set in the console** (Settings → Security), not an SDK call. When it's on, memories are stored encrypted and the SDK keeps returning plaintext — nothing changes in your code. See [Encryption at rest](/concepts/encryption).
 
 ## Recall response
 

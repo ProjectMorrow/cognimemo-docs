@@ -81,10 +81,7 @@ cm.update_bank_config("jane@acme.com", retain_auto_entities=True)
 
 ## Encryption at rest
 
-```python
-cm.enable_encryption("jane@acme.com")     # encryption="managed"; recall stays transparent
-cm.disable_encryption("jane@acme.com")
-```
+Encryption is a **project-level policy set in the console** (Settings → Security), not an SDK call. When it's on, memories are stored encrypted and the SDK keeps returning plaintext — nothing changes in your code. See [Encryption at rest](/concepts/encryption).
 
 ## Recall response
 
