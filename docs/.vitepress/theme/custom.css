@@ -24,4 +24,34 @@
 }
 
 /* Button contrast: brand-3 fills need dark ink, matching the console. */
-.VPButton.brand { color: #0A2A02 !important; }
+.VPButton.brand { color: #0A2A02 !important; font-weight: 700; }
+
+/* ---- Home hero ---- */
+.VPHero .name { font-weight: 800; letter-spacing: -0.02em; }
+.VPHero .text { font-weight: 700; letter-spacing: -0.01em; }
+.VPHero .image-bg { opacity: 0.7; }
+.VPHero .VPImage {
+  filter: drop-shadow(0 0 40px rgba(79, 191, 0, 0.35));
+}
+
+/* ---- Feature cards: branded icon chips + hover lift ---- */
+.VPFeatures .VPFeature {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 14px;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.VPFeatures .VPFeature:hover {
+  border-color: var(--vp-c-brand-3);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px -12px var(--vp-c-brand-soft);
+}
+.VPFeature .icon {
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft) !important;
+  border-radius: 10px;
+}
+.VPFeature .icon svg { width: 24px; height: 24px; }
+.VPFeature .title { font-weight: 700; letter-spacing: -0.01em; }
+
+/* Inline code / brand pills a touch closer to the console */
+:root { --vp-code-tab-active-text-color: var(--vp-c-brand-1); }
