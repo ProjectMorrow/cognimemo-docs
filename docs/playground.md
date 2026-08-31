@@ -24,5 +24,5 @@ the **cURL** snippet and run it from your terminal, or add the docs domain to
 - **reflect** — an LLM answer synthesized from recalled memory. `POST /v1/me/banks/{bank}/reflect` with `{ query, space }`.
 
 Bank IDs are URL-encoded automatically (`jane@acme.com` → `jane%40acme.com`). See the
-[API Reference](/api-reference/overview) for every parameter, or the
+[API Reference](/api) for every parameter, or the
 [SDKs](/sdks/overview) to skip HTTP entirely.

@@ -20,9 +20,9 @@ Isolation is strict: an API key for one project can never read another project's
 
 ## The three operations
 
-- **Retain** — store a memory. Embeddings (and, with a real LLM, entities and links) are computed on ingest. See [Retain](/api-reference/retain).
-- **Recall** — retrieve memories with a hybrid of semantic, keyword, graph, and temporal search, fused and reranked. See [Recall](/api-reference/recall).
-- **Reflect** — generate a synthesized, disposition-aware answer from memories and consolidated observations. See [Reflect](/api-reference/reflect).
+- **Retain** — store a memory. Embeddings (and, with a real LLM, entities and links) are computed on ingest. See [Retain](/api).
+- **Recall** — retrieve memories with a hybrid of semantic, keyword, graph, and temporal search, fused and reranked. See [Recall](/api).
+- **Reflect** — generate a synthesized, disposition-aware answer from memories and consolidated observations. See [Reflect](/api).
 
 ## Fact types
 

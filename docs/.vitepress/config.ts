@@ -15,7 +15,7 @@ export default defineConfig({
     nav: [
       { text: "Docs", link: "/getting-started/overview" },
       { text: "SDKs", link: "/sdks/overview" },
-      { text: "API Reference", link: "/api-reference/overview" },
+      { text: "API Reference", link: "/api" },
       { text: "MCP", link: "/mcp/overview" },
       { text: "Playground", link: "/playground" },
     ],
@@ -56,11 +56,7 @@ export default defineConfig({
       {
         text: "API Reference",
         items: [
-          { text: "Overview", link: "/api-reference/overview" },
-          { text: "Retain", link: "/api-reference/retain" },
-          { text: "Recall", link: "/api-reference/recall" },
-          { text: "Reflect", link: "/api-reference/reflect" },
-          { text: "Spaces & Banks", link: "/api-reference/spaces-banks" },
+          { text: "Interactive reference ↗", link: "/api" },
         ],
       },
       {

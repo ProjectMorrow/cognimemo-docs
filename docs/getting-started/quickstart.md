@@ -77,4 +77,4 @@ Account → Project → Space (org) → Bank (person/agent) → Memories
 - [Typed memory blocks](/concepts/typed-blocks) — procedures, preferences, corrections, and more
 - [Python SDK](/sdks/python) · [TypeScript SDK](/sdks/typescript)
 - [MCP Server](/mcp/overview) — connect Claude, Cursor, and other agents
-- [API Reference](/api-reference/overview)
+- [API Reference](/api)

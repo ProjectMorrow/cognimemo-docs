@@ -37,4 +37,4 @@ const cm = new CognimemoClient({ baseUrl: "https://api.cognimemo.com", apiKey: "
 ## Other clients
 
 - **MCP** — connect Claude, Cursor, and other agents without an SDK. See [MCP Server](/mcp/overview).
-- **REST** — call the API directly. See the [API Reference](/api-reference/overview).
+- **REST** — call the API directly. See the [API Reference](/api).

@@ -1,0 +1,247 @@
+openapi: 3.1.0
+info:
+  title: Cognimemo API
+  version: "1.0.0"
+  description: |
+    Persistent, queryable memory for AI agents — **retain**, **recall**, **reflect**.
+
+    All calls go to the gateway with a per-project API key (`cmk_live_…`). The tenant
+    segment is `me` (your project, resolved from the key). Bank IDs are URL-encoded
+    (`jane@acme.com` → `jane%40acme.com`).
+servers:
+  - url: https://api.cognimemo.com
+    description: Production
+  - url: https://dev-api.cognimemo.com
+    description: Development
+security:
+  - bearerAuth: []
+tags:
+  - name: Memory
+    description: Store and query memories.
+  - name: Spaces & Banks
+    description: Organize memories — space → bank → memories.
+paths:
+  /v1/me/banks/{bank_id}/memories:
+    post:
+      tags: [Memory]
+      summary: Retain a memory
+      description: |
+        Store a memory. The engine extracts typed facts, entities, and temporal
+        structure — you send plain content, no schema to design.
+      operationId: retain
+      parameters:
+        - $ref: "#/components/parameters/BankId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RetainRequest" }
+            examples:
+              simple:
+                summary: A plain memory
+                value:
+                  content: "Jane prefers deploys on Fridays and owns the billing service."
+                  space: "acme"
+              typed:
+                summary: A typed preference block
+                value:
+                  content: "For day-planning, use my personal Gmail, not work."
+                  space: "acme"
+                  fact_type: "preference"
+      responses:
+        "200":
+          description: Stored.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RetainResponse" }
+              example: { success: true, bank_id: "jane@acme.com", items_count: 1, usage: { tokens: 42 } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/QuotaExceeded" }
+  /v1/me/banks/{bank_id}/memories/recall:
+    post:
+      tags: [Memory]
+      summary: Recall memories
+      description: |
+        Semantic search across the eight fact-types with cross-encoder reranking.
+        Set `include_org: true` (with `space`) to blend the space's org memory —
+        the person wins on conflict.
+      operationId: recall
+      parameters:
+        - $ref: "#/components/parameters/BankId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RecallRequest" }
+            example:
+              query: "when does Jane deploy?"
+              max_tokens: 1024
+              budget: "mid"
+              space: "acme"
+      responses:
+        "200":
+          description: Ranked memories.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RecallResponse" }
+              example:
+                results:
+                  - id: "mem_8f2c"
+                    text: "Jane prefers deploys on Fridays."
+                    type: "world"
+                    scores: { combined: 0.91 }
+                usage: { tokens_used: 128, max_tokens: 1024, truncated: false, results_count: 1 }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/QuotaExceeded" }
+  /v1/me/banks/{bank_id}/reflect:
+    post:
+      tags: [Memory]
+      summary: Reflect
+      description: An LLM answer synthesized from recalled memory — mental models and directives, not just raw hits.
+      operationId: reflect
+      parameters:
+        - $ref: "#/components/parameters/BankId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReflectRequest" }
+            example: { query: "What is Jane's release cadence?", space: "acme" }
+      responses:
+        "200":
+          description: A synthesized answer.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReflectResponse" }
+              example: { text: "Jane ships on a weekly cadence, deploying on Fridays." }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /v1/me/banks/{bank_id}/memories/list:
+    get:
+      tags: [Memory]
+      summary: List memories
+      operationId: listMemories
+      parameters:
+        - $ref: "#/components/parameters/BankId"
+        - { name: limit, in: query, schema: { type: integer, default: 100 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0 } }
+      responses:
+        "200":
+          description: Stored memories.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items: { type: array, items: { $ref: "#/components/schemas/Memory" } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /v1/me/banks:
+    get:
+      tags: [Spaces & Banks]
+      summary: List banks
+      operationId: listBanks
+      responses:
+        "200":
+          description: Banks in the project.
+          content:
+            application/json:
+              schema: { type: object, properties: { banks: { type: array, items: { type: string } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: cmk_live_…
+      description: Project API key. Mint one in the console under **Connect → API Keys**.
+  parameters:
+    BankId:
+      name: bank_id
+      in: path
+      required: true
+      description: URL-encoded bank id (a person or entity), e.g. `jane%40acme.com`.
+      schema: { type: string }
+      example: "jane%40acme.com"
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example: { detail: "not authenticated" }
+    QuotaExceeded:
+      description: Monthly plan quota exceeded.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example: { detail: "monthly recall quota exceeded (5000/5000)" }
+  schemas:
+    RetainRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string, description: The memory to store. }
+        space: { type: string, description: Space (organization) the bank belongs to. }
+        context: { type: string, description: Optional context description. }
+        timestamp: { type: string, format: date-time, description: Event time (ISO 8601); defaults to now. }
+        fact_type:
+          type: string
+          description: Store as a typed block instead of an auto-extracted fact.
+          enum: [world, experience, observation, procedure, reasoning, preference, correction, profile]
+        tags: { type: array, items: { type: string } }
+    RetainResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        bank_id: { type: string }
+        items_count: { type: integer }
+        usage: { type: object, properties: { tokens: { type: integer } } }
+    RecallRequest:
+      type: object
+      required: [query]
+      properties:
+        query: { type: string }
+        max_tokens: { type: integer, default: 1024, description: Token budget for the returned context. }
+        budget: { type: string, enum: [low, mid, high], default: mid, description: Retrieval effort. }
+        space: { type: string }
+        include_org: { type: boolean, default: false, description: Blend the space's org memory (person wins). }
+        types:
+          type: array
+          description: Restrict to specific fact-types.
+          items: { type: string }
+    RecallResponse:
+      type: object
+      properties:
+        results: { type: array, items: { $ref: "#/components/schemas/Memory" } }
+        usage:
+          type: object
+          properties:
+            tokens_used: { type: integer }
+            max_tokens: { type: integer }
+            truncated: { type: boolean }
+            results_count: { type: integer }
+    ReflectRequest:
+      type: object
+      required: [query]
+      properties:
+        query: { type: string }
+        space: { type: string }
+        context: { type: string }
+    ReflectResponse:
+      type: object
+      properties:
+        text: { type: string, description: The answer as markdown. }
+    Memory:
+      type: object
+      properties:
+        id: { type: string }
+        text: { type: string }
+        type: { type: string, description: "Fact-type: world | experience | observation | procedure | …" }
+        context: { type: string }
+        occurred_start: { type: string, format: date-time }
+        entities: { type: array, items: { type: string } }
+        tags: { type: array, items: { type: string } }
+        scores: { type: object, additionalProperties: { type: number } }
+    Error:
+      type: object
+      properties:
+        detail: { type: string }
