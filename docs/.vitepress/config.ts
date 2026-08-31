@@ -17,6 +17,7 @@ export default defineConfig({
       { text: "SDKs", link: "/sdks/overview" },
       { text: "API Reference", link: "/api" },
       { text: "MCP", link: "/mcp/overview" },
+      { text: "Self-Hosting", link: "/self-hosting/overview" },
       { text: "Playground", link: "/playground" },
     ],
     search: { provider: "local" },
@@ -63,6 +64,12 @@ export default defineConfig({
         text: "Cloud",
         items: [
           { text: "Gateway API", link: "/cloud/gateway" },
+        ],
+      },
+      {
+        text: "Self-Hosting",
+        items: [
+          { text: "Overview", link: "/self-hosting/overview" },
         ],
       },
       {
