@@ -41,23 +41,32 @@ pipeline (extraction → retrieval → reading).
 ## Latency
 
 Client-observed, end-to-end through the managed gateway (includes network,
-extraction/embeddings, the full multi-arm retrieval + cross-encoder rerank, and
-generation). Your numbers vary with region and payload size.
+embeddings, retrieval, and — for reflect — generation). Measured warm against
+production.
 
-| Operation | p50 | p95 | What it does |
-|---|---|---|---|
-| **retain** | ~1.4s | ~3.8s | embed + LLM fact extraction |
-| **recall** | ~7.5s | ~8.8s | multi-fact-type retrieval → RRF → cross-encoder rerank → entities |
-| **reflect** | ~30s | ~99s | agentic multi-step synthesis over recalled memory |
+| Operation | p50 | What it does |
+|---|---|---|
+| **recall** | **~300ms** | multi-fact-type retrieval → RRF → cross-encoder rerank |
+| **retain** | ~1.5s | embed + LLM fact extraction |
+| **reflect** | ~17–30s | agentic multi-step synthesis over recalled memory |
 
 **Reading these honestly:**
 
-- **`retain` is fast enough to sit inline** in an agent turn.
-- **`recall` (~7.5s)** reflects the full managed pipeline, not raw vector lookup. If
-  you need lower latency, narrow the fact-types you query or lower the recall
-  `budget` — and expect this to come down as we tune the rerank stage.
-- **`reflect` is a synthesis call, not a hot-path lookup.** Use `recall` for
-  interactive per-turn memory injection and reserve `reflect` for on-demand summaries.
+- **`recall` (~300ms warm) is the hot path** — fast enough to inject memory on
+  every agent turn. Bank size barely moves it (a 3-fact bank and a 400-turn bank
+  both land ~300ms), so it stays flat as memory grows.
+- **`retain` (~1.5s)** does real LLM fact extraction — spend the time here, at
+  write-time, so recall stays cheap. Use `retain_async` to make it fire-and-forget.
+- **`reflect` is a synthesis call, not a hot-path lookup** — it runs multiple LLM
+  steps, so it's inherently seconds. Use `recall` for per-turn memory injection and
+  reserve `reflect` for on-demand summaries.
+
+::: tip Getting the low latency
+`recall` latency is dominated by two things you control: **caller region** (put your
+agent in the same region as the deployment) and **sustained load on burstable
+instances** (a steady request rate on a shared CPU throttles — a compute/GPU node
+holds the ~300ms under load). Isolated warm calls are already sub-second.
+:::
 
 ## Reproduce it
 
