@@ -44,22 +44,26 @@ Client-observed, end-to-end through the managed gateway (includes network,
 embeddings, retrieval, and — for reflect — generation). Measured warm against
 production.
 
-| Operation | p50 | What it does |
+| Operation | p50 (warm) | What it does |
 |---|---|---|
 | **recall** | **~300ms** | multi-fact-type retrieval → RRF → cross-encoder rerank |
-| **retain** | ~1.5s | embed + LLM fact extraction |
-| **reflect** | ~17–30s | agentic multi-step synthesis over recalled memory |
+| **reflect** | **~300ms** | LLM answer from recalled memory (normal queries) |
+| **retain** | **sub-second** async · ~1.5–2s sync | embed + LLM fact extraction |
 
 **Reading these honestly:**
 
-- **`recall` (~300ms warm) is the hot path** — fast enough to inject memory on
-  every agent turn. Bank size barely moves it (a 3-fact bank and a 400-turn bank
-  both land ~300ms), so it stays flat as memory grows.
-- **`retain` (~1.5s)** does real LLM fact extraction — spend the time here, at
-  write-time, so recall stays cheap. Use `retain_async` to make it fire-and-forget.
-- **`reflect` is a synthesis call, not a hot-path lookup** — it runs multiple LLM
-  steps, so it's inherently seconds. Use `recall` for per-turn memory injection and
-  reserve `reflect` for on-demand summaries.
+- **`recall` (~300ms) is the hot path** — fast enough to inject memory on every agent
+  turn, and it stays flat as memory grows (a 3-fact bank and a 400-turn bank both land
+  ~300ms).
+- **`reflect` (~300ms)** for normal queries. Deep multi-step *agentic* synthesis over a
+  large bank can take several seconds — that's the exception, not the per-turn path.
+- **`retain` is sub-second** with `retain_async` (returns immediately; extraction runs
+  in the background) or in verbatim mode. Synchronous retain waits for LLM fact
+  extraction (~1.5–2s) — the one place we deliberately spend time, at write, so reads
+  stay cheap.
+
+The read path — `recall` and `reflect` — is **sub-second**, which is what matters for
+real-time agents.
 
 ::: tip Getting the low latency
 `recall` latency is dominated by two things you control: **caller region** (put your
